@@ -12,4 +12,5 @@ import com.softdesign.voto.model.Voto;
 @Repository
 public interface VotoReporitory extends CrudRepository<Voto, Integer> {
 	List<Voto> findByIdPauta(Integer idPauta);
+	List<Voto> findByIdAssociado(Integer idAssociado);
 }

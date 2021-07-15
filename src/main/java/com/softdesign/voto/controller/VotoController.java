@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.softdesign.voto.model.Voto;
 import com.softdesign.voto.repository.VotoReporitory;
+import com.softdesign.voto.service.SessaoService;
 import com.softdesign.voto.service.VotoService;
 
 @RestController
@@ -18,16 +19,24 @@ public class VotoController {
 	private VotoReporitory votoDao;
 
 	@Autowired
-	private VotoService service;
+	private VotoService votoService;
+	@Autowired
+	private SessaoService sessaoService;
 	
 	@PostMapping(path="/voto")
 	public ResponseEntity<?> salvarVoto(@RequestBody Voto voto){
-		Integer idAssociado = voto.getIdAssociado();
-		service.criarSessao(idAssociado);
+		sessaoService.criarSessao(voto.getIdAssociado());
 		
-		if(service.validarSessao(idAssociado)) {
-			return new ResponseEntity<>(votoDao.save(voto),HttpStatus.OK);
+		boolean sessaoValida = sessaoService.validarSessao(voto.getIdAssociado());
+		boolean votoValido =  votoService.validarVoto(voto);
+		boolean cpfValido =  votoService.validarCpf(voto.getIdAssociado());
+		
+		if(sessaoValida && votoValido && cpfValido) {
+			votoDao.save(voto);
+			return new ResponseEntity<>("Voto computado com sucesso!",HttpStatus.OK);
+		}else {
+			String mensagem = votoService.invalidarVoto(sessaoValida,votoValido,cpfValido);
+			return new ResponseEntity<>(mensagem,HttpStatus.FORBIDDEN);
 		}
-		return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 	}
 }

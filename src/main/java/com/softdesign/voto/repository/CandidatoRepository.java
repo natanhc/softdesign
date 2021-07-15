@@ -6,7 +6,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import com.softdesign.voto.model.Candidato;
-import com.softdesign.voto.model.Pauta;
 
 @Repository
 public interface CandidatoRepository extends CrudRepository<Candidato, Integer>{

@@ -28,6 +28,4 @@ public class Candidato {
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
 	}
-	
-	
 }

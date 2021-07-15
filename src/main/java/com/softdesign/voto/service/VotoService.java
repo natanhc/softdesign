@@ -1,24 +1,15 @@
 package com.softdesign.voto.service;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import com.softdesign.voto.dto.ResultadoDTO;
-import com.softdesign.voto.model.Sessao;
+import com.softdesign.voto.model.Associado;
 import com.softdesign.voto.model.Voto;
-import com.softdesign.voto.repository.SessaoRepository;
+import com.softdesign.voto.repository.AssociadoRepository;
 import com.softdesign.voto.repository.VotoReporitory;
 
 @Service
@@ -27,38 +18,47 @@ public class VotoService {
 	@Autowired
 	public VotoReporitory votoDao;
 	@Autowired
-	public SessaoRepository sessaoDao;
-	@Autowired
-	private VotoService service;
+	public AssociadoRepository associadoDao;
 
-	public void criarSessao(Integer idAssociado) {
-		Sessao sessao = new Sessao();
-		sessao.setAtiva(true);
-		sessao.setIdAssociado(idAssociado);
-		sessao.setHoraInicio(new Timestamp(System.currentTimeMillis()));
-		sessaoDao.save(sessao);
+
+	public boolean validarVoto(Voto voto) {
+		boolean validadeVoto = verificarDuplicidade(voto);
+		return validadeVoto;
 	}
 	
-	public void desativarSessao(Sessao sessao) {
-		sessao.setAtiva(false);
-		sessaoDao.save(sessao);
+	public String invalidarVoto(boolean sessao,boolean voto,boolean cpf) {
+		String mensagem=new String();
+		if(!sessao) {
+			mensagem="Sua sessão expirou! Tente novamente."; 
+		}else if(!voto){
+			mensagem="Não é possível votar mais de uma vez na mesma opção!"; 
+		}else if(!cpf){
+			mensagem="CPF inválido!"; 
+		}
+		return mensagem;
 	}
 
-	public Optional<Sessao> buscarSessaoValida(Integer idAssociado) {
-		List<Sessao> sessoes = sessaoDao.findByIdAssociado(idAssociado);
-		Integer idSessao = sessoes.stream().filter(s -> s.getAtiva() == true).mapToInt(s -> s.getId()).findFirst()
-				.getAsInt();
-		return sessaoDao.findById(idSessao);
-	}
+	public boolean verificarDuplicidade(Voto voto) {
 
-	public boolean validarSessao(Integer idAssociado) {
-		Sessao sessao = buscarSessaoValida(idAssociado).get();
-		Date horaInicio = sessao.getHoraInicio();
-		Date horaAgora = new Date();
-		int diferencaDeTempo = (int) ((horaInicio.getTime() / 60000) - (horaAgora.getTime() / 60000));
+		List<Voto> listaPautas = votoDao.findByIdPauta(voto.getIdPauta());
+		List<Voto> listaVotoPorAssociado = listaPautas.stream().filter(l->l.getIdAssociado()==
+				voto.getIdAssociado()).collect(Collectors.toList());
 		
-		boolean valido = (diferencaDeTempo < 0) ? false : true;
-		desativarSessao(sessao);
+		boolean valido = (listaVotoPorAssociado.size() > 0) ? false : true;
 		return valido;
+	}
+	
+	public boolean validarCpf(Integer idAssociado) {
+		RestTemplate restTemplate = new RestTemplate();
+		Associado a = associadoDao.findById(idAssociado).get();
+		String cpf = a.getCpf();
+		String resultado;
+		try { 
+			resultado = restTemplate.getForObject("https://user-info.herokuapp.com/users/"+cpf, String.class);
+			boolean valido = (resultado.contains("UNABLE_TO_VOTE")) ? false : true;
+			return valido;
+		}catch (Exception e) {
+			return false;
+		}
 	}
 }

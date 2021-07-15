@@ -1,9 +1,11 @@
 package com.softdesign.voto.model;
 
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+@Entity
 public class Associado {
 
 	@Id
@@ -11,6 +13,7 @@ public class Associado {
 	private Integer id;
 	private String nome;
 	private String cpf;
+	
 	public Integer getId() {
 		return id;
 	}
