@@ -25,7 +25,6 @@ public class VotoController {
 	
 	@PostMapping(path="/voto")
 	public ResponseEntity<?> salvarVoto(@RequestBody Voto voto){
-//		sessaoService.criarSessao(voto.getIdAssociado(),60000);
 		
 		boolean sessaoValida = sessaoService.validarSessao(voto.getIdAssociado());
 		boolean votoValido =  votoService.validarVoto(voto);
