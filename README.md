@@ -17,6 +17,9 @@ instância esteja ativa com um banco de dados chamado "voto", e a partir daí a 
 
 # OBSERVAÇÕES
 
-1 O serviço externo de validação de CPF (a API https://user-info.herokuapp.com/users/{cpf}), não retorna sempre ABLE para um CPF válido, às vezes retornando UNABLE para um mesmo CPF que foi validado por ela anteriormente.
+1 O serviço externo de validação de CPF proposto (a API https://user-info.herokuapp.com/users/{cpf}), não retorna sempre ABLE para um CPF válido, às vezes retornando UNABLE para um mesmo CPF que foi validado por ela anteriormente. 
 
-2 Como não foi desenvolvido um front-end, o encerramento de um sessão após determinado tempo foi criado como um serviço que pode ser consumido externamente.
+2 Como não foi desenvolvido um front-end para gerenciar sessões (quando inica ou termina a possibilidade de votação para os associados), o encerramento de um sessão foi criado como um serviço que pode ser consumido externamente ou a cada tentativa de voto (tenha sido a tentativa bem sucedida ou não, caso alguma das validações, de CPF ou voto duplicado, tenha sido acionada).
+
+3 Seguindo a mesma lógica anterior, antes de realizar o voto por um associado, é necessário abrir a sua sessão também, caso contrário ele irá negar o voto por sessão expirada.
+
