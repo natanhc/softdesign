@@ -14,6 +14,14 @@ public class Sessao {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	private Integer idAssociado;
+	private Integer tempo;
+	
+	public Integer getTempo() {
+		return tempo;
+	}
+	public void setTempo(Integer tempo) {
+		this.tempo = tempo;
+	}
 	private Boolean ativa;
 	private Timestamp horaInicio;
 	

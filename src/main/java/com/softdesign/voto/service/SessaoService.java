@@ -17,30 +17,37 @@ public class SessaoService {
 	@Autowired
 	public SessaoRepository sessaoDao;
 
-	public void criarSessao(Integer idAssociado) {
+	public void criarSessao(Integer idAssociado, Integer tempo) {
 		Sessao sessao = new Sessao();
 		sessao.setAtiva(true);
 		sessao.setIdAssociado(idAssociado);
+		sessao.setTempo(tempo);
 		sessao.setHoraInicio(new Timestamp(System.currentTimeMillis()));
 		sessaoDao.save(sessao);
 	}
 
 	public boolean validarSessao(Integer idAssociado) {
-		Sessao sessao = buscarSessaoValida(idAssociado).get();
-		Date horaInicio = sessao.getHoraInicio();
-		Date horaAgora = new Date();
-		int diferencaDeTempo = (int) ((horaInicio.getTime() / 60000) - (horaAgora.getTime() / 60000));
-		
-		boolean valido = (diferencaDeTempo < 0) ? false : true;
-		desativarSessao(sessao);
-		return valido;
+		try {
+			Sessao sessao = buscarSessaoValida(idAssociado).get();
+			Date horaInicio = sessao.getHoraInicio();
+			Integer tempo = sessao.getTempo();
+			Date horaAgora = new Date();
+			int diferencaDeTempo = (int) ((horaInicio.getTime() / tempo) - (horaAgora.getTime() / tempo));
+			
+			boolean valido = (diferencaDeTempo < 0) ? false : true;
+			desativarSessao(sessao);
+			return valido;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 	public Optional<Sessao> buscarSessaoValida(Integer idAssociado) {
-		List<Sessao> sessoes = sessaoDao.findByIdAssociado(idAssociado);
-		Integer idSessao = sessoes.stream().filter(s -> s.getAtiva() == true).mapToInt(s -> s.getId()).findFirst()
-				.getAsInt();
-		return sessaoDao.findById(idSessao);
+			List<Sessao> sessoes = sessaoDao.findByIdAssociado(idAssociado);
+			Integer idSessao = sessoes.stream().filter(s -> s.getAtiva() == true).mapToInt(s -> s.getId()).findFirst()
+					.getAsInt();
+			return sessaoDao.findById(idSessao);
+
 	}
 
 	public void desativarSessao(Sessao sessao) {
