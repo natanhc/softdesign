@@ -18,7 +18,7 @@ public class AssociadoController {
 	private AssociadoRepository associadoDao;
 	
 	@PostMapping(path="/associado")
-	public ResponseEntity<?> salvarNovaPauta(@RequestBody Associado associado){
+	public ResponseEntity<?> salvarNovoAssociado(@RequestBody Associado associado){
 		return new ResponseEntity<>(associadoDao.save(associado),HttpStatus.OK);
 	}
 }
