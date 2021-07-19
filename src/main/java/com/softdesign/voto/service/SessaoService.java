@@ -8,15 +8,17 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.softdesign.voto.interfaces.ISessao;
 import com.softdesign.voto.model.Sessao;
 import com.softdesign.voto.repository.SessaoRepository;
 
 @Service
-public class SessaoService {
+public class SessaoService implements ISessao{
 	
 	@Autowired
 	public SessaoRepository sessaoDao;
 
+	@Override
 	public void criarSessao(Integer idAssociado, Integer tempo) {
 		Sessao sessao = new Sessao();
 		sessao.setAtiva(true);
@@ -26,6 +28,7 @@ public class SessaoService {
 		sessaoDao.save(sessao);
 	}
 
+	@Override
 	public boolean validarSessao(Integer idAssociado) {
 		try {
 			Sessao sessao = buscarSessaoValida(idAssociado).get();
@@ -42,6 +45,7 @@ public class SessaoService {
 		}
 	}
 
+	@Override
 	public Optional<Sessao> buscarSessaoValida(Integer idAssociado) {
 			List<Sessao> sessoes = sessaoDao.findByIdAssociado(idAssociado);
 			Integer idSessao = sessoes.stream().filter(s -> s.getAtiva() == true).mapToInt(s -> s.getId()).findFirst()
@@ -50,6 +54,7 @@ public class SessaoService {
 
 	}
 
+	@Override
 	public void desativarSessao(Sessao sessao) {
 		sessao.setAtiva(false);
 		sessaoDao.save(sessao);

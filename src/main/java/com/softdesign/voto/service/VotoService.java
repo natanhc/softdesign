@@ -7,47 +7,67 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.softdesign.voto.dto.AssociadoDTO;
+import com.softdesign.voto.dto.VotoDTO;
+import com.softdesign.voto.interfaces.IVoto;
 import com.softdesign.voto.model.Associado;
 import com.softdesign.voto.model.Voto;
 import com.softdesign.voto.repository.AssociadoRepository;
 import com.softdesign.voto.repository.VotoReporitory;
 
 @Service
-public class VotoService {
+public class VotoService implements IVoto {
 
 	@Autowired
 	public VotoReporitory votoDao;
 	@Autowired
 	public AssociadoRepository associadoDao;
+	@Autowired
+	private SessaoService sessao;
 
-
-	public boolean validarVoto(Voto voto) {
-		boolean validadeVoto = verificarDuplicidade(voto);
-		return validadeVoto;
+	@Override
+	public Voto create(VotoDTO requisicao) {
+		Voto voto = new Voto();
+		voto.setIdPauta(requisicao.getIdPauta());
+		voto.setIdCandidato(requisicao.getIdCandidato());
+		voto.setIdAssociado(requisicao.getIdAssociado());
+		voto.setResposta(requisicao.getResposta());
+		return voto;
 	}
 	
-	public String invalidarVoto(boolean sessao,boolean voto,boolean cpf) {
-		String mensagem=new String();
-		if(!sessao) {
-			mensagem="Sua sessão expirou! Tente novamente."; 
-		}else if(!voto){
-			mensagem="Não é possível votar mais de uma vez na mesma opção!"; 
-		}else if(!cpf){
-			mensagem="CPF inválido!"; 
-		}
-		return mensagem;
+	@Override
+	public void save(VotoDTO requisicao) {
+		validate(requisicao);
+		Voto voto= create(requisicao);
+		votoDao.save(voto);
 	}
 
-	public boolean verificarDuplicidade(Voto voto) {
+	@Override
+	public void validate(VotoDTO requisicao) {
+		if (requisicao.getIdPauta() == null || requisicao.getIdCandidato() == null || 
+				requisicao.getIdAssociado() == null || requisicao.getResposta() == null ) {
+			throw new RuntimeException("Erro ao persistir o seu voto! Verifique as informações.");
+		}else if(!sessao.validarSessao(requisicao.getIdAssociado())) {
+			throw new RuntimeException("Sua sessão expirou! Tente novamente.");
+		}else if(!verificarDuplicidade(requisicao)) {
+			throw new RuntimeException("Não é possível votar mais de uma vez na mesma opção!");
+		}else if(!validarCpf(requisicao.getIdAssociado())){
+			throw new RuntimeException("CPF inválido!");
+		};
+	}
 
-		List<Voto> listaPautas = votoDao.findByIdPauta(voto.getIdPauta());
+	@Override
+	public boolean verificarDuplicidade(VotoDTO requisicao) {
+
+		List<Voto> listaPautas = votoDao.findByIdPauta(requisicao.getIdPauta());
 		List<Voto> listaVotoPorAssociado = listaPautas.stream().filter(l->l.getIdAssociado()==
-				voto.getIdAssociado()).collect(Collectors.toList());
+				requisicao.getIdAssociado()).collect(Collectors.toList());
 		
 		boolean valido = (listaVotoPorAssociado.size() > 0) ? false : true;
 		return valido;
 	}
 	
+	@Override
 	public boolean validarCpf(Integer idAssociado) {
 		RestTemplate restTemplate = new RestTemplate();
 		Associado a = associadoDao.findById(idAssociado).get();

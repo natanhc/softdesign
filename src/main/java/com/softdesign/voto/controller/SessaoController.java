@@ -19,8 +19,4 @@ public class SessaoController {
 		sessaoService.criarSessao(idAssociado,tempo);
 	}
 	
-	@GetMapping(path="/encerrarSessao")
-	public void encerrarSessao(@RequestParam Sessao sessao){
-		sessaoService.desativarSessao(sessao);
-	}
 }
