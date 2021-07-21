@@ -1,4 +1,4 @@
-package com.softdesign.voto.enums;
+package com.softdesign.voto.enumeration;
 
 public enum OpcaoEnum {
 

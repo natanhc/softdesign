@@ -1,7 +1,6 @@
 package com.softdesign.voto.model;
 
 import java.sql.Timestamp;
-import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,6 +14,8 @@ public class Sessao {
 	private Integer id;
 	private Integer idAssociado;
 	private Integer tempo;
+	private Boolean ativa;
+	private Timestamp horaInicio;
 	
 	public Integer getTempo() {
 		return tempo;
@@ -22,8 +23,6 @@ public class Sessao {
 	public void setTempo(Integer tempo) {
 		this.tempo = tempo;
 	}
-	private Boolean ativa;
-	private Timestamp horaInicio;
 	
 	public Integer getId() {
 		return id;

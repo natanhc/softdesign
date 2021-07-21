@@ -11,17 +11,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.softdesign.voto.dto.PautaDTO;
 import com.softdesign.voto.dto.ResultadoDTO;
-import com.softdesign.voto.service.PautaService;
-import com.softdesign.voto.service.ResultadoService;
+import com.softdesign.voto.service.impl.PautaServiceImpl;
+import com.softdesign.voto.service.impl.ResultadoServiceImpl;
 
 @RestController
 public class PautaController {
 
 	@Autowired
-	private PautaService pauta;
+	private PautaServiceImpl pauta;
 
 	@Autowired
-	private ResultadoService resultado;
+	private ResultadoServiceImpl resultado;
 	
 	@PostMapping(path="/pauta")
 	public void salvarNovaPauta(@RequestBody PautaDTO requisicao){
