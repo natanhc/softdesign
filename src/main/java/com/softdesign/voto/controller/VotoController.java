@@ -12,10 +12,10 @@ import com.softdesign.voto.service.impl.VotoServiceImpl;
 public class VotoController {
 
 	@Autowired
-	private VotoServiceImpl voto;
+	private VotoServiceImpl votoService;
 	
 	@PostMapping(path="/voto")
 	public void salvarVoto(@RequestBody VotoDTO requisicao){
-		voto.save(requisicao);
+		votoService.save(requisicao);
 	}
 }

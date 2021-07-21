@@ -18,18 +18,18 @@ import com.softdesign.voto.service.impl.ResultadoServiceImpl;
 public class PautaController {
 
 	@Autowired
-	private PautaServiceImpl pauta;
+	private PautaServiceImpl pautaService;
 
 	@Autowired
-	private ResultadoServiceImpl resultado;
+	private ResultadoServiceImpl resultadoService;
 	
 	@PostMapping(path="/pauta")
 	public void salvarNovaPauta(@RequestBody PautaDTO requisicao){
-		pauta.save(requisicao);
+		pautaService.save(requisicao);
 	}
 	
 	@GetMapping(path="/resultado")
 	public List<ResultadoDTO> obterResultado(@RequestParam Integer idPauta){
-		return resultado.obterResultado(idPauta);
+		return resultadoService.obterResultado(idPauta);
 	}
 }

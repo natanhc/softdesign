@@ -13,10 +13,10 @@ import com.softdesign.voto.service.impl.AssociadoServiceImpl;
 public class AssociadoController {
 
 	@Autowired
-	AssociadoServiceImpl associado;
+	AssociadoServiceImpl associadoService;
 
 	@PostMapping(path="/associado")
 	public void salvarNovoAssociado(@RequestBody AssociadoDTO requisicao){
-		associado.save(requisicao);
+		associadoService.save(requisicao);
 	}
 }
